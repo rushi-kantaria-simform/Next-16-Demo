@@ -53,11 +53,6 @@ export default function HomePage() {
                   <ArrowRight className="size-4" aria-hidden />
                 </Button>
               </Link>
-              <Link href="/about">
-                <Button size="lg" variant="secondary">
-                  About this build
-                </Button>
-              </Link>
             </div>
           </div>
         </Container>
