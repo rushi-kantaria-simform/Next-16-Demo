@@ -66,7 +66,6 @@ models) still assume.
 | 10  | [Proxy, Security & Middleware](docs/10-proxy-security-middleware.md)       | `proxy.ts`, layered auth with real status codes, CSP and security headers                               |
 | 11  | [SEO & Metadata](docs/11-seo-and-metadata.md)                              | Sitemap, robots, OG images, JSON-LD, canonical URLs                                                     |
 | 12  | [AI & Agent Integration](docs/12-ai-agent-integration.md)                  | `AGENTS.md` with bundled version-matched docs, `instant()` tests, agent-readable errors                 |
-| 13  | Hands-On Implementation                                                    | 🚧 Up next                                                                                              |
 
 ## Getting started
 
