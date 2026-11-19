@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    // ES2022 is safe: Next 16 requires Node 20.9+ and Chrome/Edge/Firefox 111+,
+    // Safari 16.4+ — all of which support it natively.
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+
+    // --- Strictness -------------------------------------------------------
+    // `strict` is the baseline. The four below are NOT included in `strict`
+    // and each one catches a class of bug that is painful to debug at runtime.
+    "strict": true,
+    // products[0] is `Product | undefined`, not `Product`. Forces you to
+    // handle the empty-array case instead of crashing on `.name`.
+    "noUncheckedIndexedAccess": true,
+    // Catches `catch (e) { e.message }` and other unsound narrowing.
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}

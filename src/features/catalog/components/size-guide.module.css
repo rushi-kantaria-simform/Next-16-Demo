@@ -1,0 +1,74 @@
+/*
+ * CSS MODULES alongside Tailwind.
+ *
+ * Tailwind handles the ~95% of styling that is composition — spacing, colour,
+ * layout. A CSS Module earns its place for the rest:
+ *
+ *   - genuinely complex selectors (`:nth-child`, sibling combinators)
+ *   - keyframes with several steps
+ *   - styling markup you do not control (third-party HTML, `dangerouslySetInnerHTML`)
+ *
+ * Next scopes these automatically: `.table` becomes something like
+ * `size-guide_table__a1b2c`, so no BEM and no collisions.
+ *
+ * Note the tokens — `var(--color-line)` and friends come from the same
+ * `@theme` block Tailwind utilities use, so a CSS Module stays on the design
+ * system instead of drifting into hardcoded hexes.
+ */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.table th {
+  color: var(--color-content-muted);
+  font-weight: 500;
+}
+
+/* Zebra striping — the kind of selector that is genuinely awkward in utilities. */
+.table tbody tr:nth-child(odd) {
+  background-color: var(--color-surface-muted);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/*
+ * CONTAINER QUERY.
+ *
+ * `@container` responds to the PARENT's width, not the viewport's. That is the
+ * difference that matters for a component rendered in both a wide detail page
+ * and a narrow modal: a `md:` breakpoint would look at the viewport and get
+ * the modal case wrong every time.
+ */
+.wrapper {
+  container-type: inline-size;
+}
+
+.note {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-content-muted);
+}
+
+@container (min-width: 30rem) {
+  .note {
+    /* Only once the CONTAINER is wide enough, regardless of screen size. */
+    font-size: 0.8125rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.625rem 1rem;
+  }
+}

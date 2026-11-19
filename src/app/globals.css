@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/**
+ * CLASS-BASED DARK MODE.
+ *
+ * Tailwind's built-in `dark:` variant is a `prefers-color-scheme` media query,
+ * which the user cannot override. Redefining the variant points it at a class
+ * instead, so a toggle can win over the OS setting.
+ *
+ * Two directives that look alike and are NOT interchangeable:
+ *   @custom-variant  DEFINES a variant          (what this is)
+ *   @variant         APPLIES one inside a rule  (e.g. `@variant dark { … }`)
+ *
+ * `:where()` keeps specificity at 0, so `.dark` never out-ranks a utility.
+ * The selector matches the element itself and its descendants, which is what
+ * makes `<html class="dark">` cascade to the whole document.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/**
+ * Tailwind v4 is configured in CSS, not in a tailwind.config.js.
+ *
+ * `@theme` declares design tokens AND generates utilities from them: naming a
+ * token `--color-brand` is what makes `bg-brand` / `text-brand` / `border-brand`
+ * exist. Adding a token here is how you extend the design system.
+ */
+@theme {
+  /* --- Brand ------------------------------------------------------------ */
+  --color-brand-50: oklch(0.97 0.02 265);
+  --color-brand-100: oklch(0.93 0.04 265);
+  --color-brand-200: oklch(0.87 0.08 265);
+  --color-brand-300: oklch(0.78 0.13 265);
+  --color-brand-400: oklch(0.68 0.18 265);
+  --color-brand-500: oklch(0.59 0.21 265);
+  --color-brand-600: oklch(0.51 0.2 265);
+  --color-brand-700: oklch(0.43 0.17 265);
+  --color-brand-800: oklch(0.36 0.13 265);
+  --color-brand-900: oklch(0.3 0.09 265);
+
+  /* --- Semantic surfaces ------------------------------------------------
+   * Mapped to the light/dark values defined in @layer base below, so
+   * `bg-surface` / `text-content` flip automatically with the colour scheme.
+   */
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-raised: var(--surface-raised);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-line: var(--line);
+
+  /* --- Typography ------------------------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* --- Shape ------------------------------------------------------------ */
+  --radius-card: 0.875rem;
+
+  /* --- Motion ----------------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Declaring `--animate-*` generates the `animate-fade-in` utility. Used by
+     (marketing)/template.tsx — it replays on every navigation because a
+     template remounts, giving a new DOM node each time. */
+  --animate-fade-in: fade-in 240ms var(--ease-out-soft) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  /**
+   * Light is the default. `.dark` overrides it.
+   *
+   * There is deliberately NO `@media (prefers-color-scheme: dark)` block any
+   * more. The inline script in the root layout resolves the OS preference and
+   * always writes an explicit `light` or `dark` class before first paint, so
+   * the media query would only ever fight with it. One source of truth.
+   */
+  :root {
+    color-scheme: light;
+    --surface: oklch(1 0 0);
+    --surface-muted: oklch(0.97 0.003 265);
+    --surface-raised: oklch(1 0 0);
+    --content: oklch(0.21 0.01 265);
+    --content-muted: oklch(0.52 0.015 265);
+    --line: oklch(0.91 0.005 265);
+  }
+
+  .dark {
+    /* Tells the browser to render form controls, scrollbars and the
+       canvas in dark — without it, native UI stays stubbornly light. */
+    color-scheme: dark;
+    --surface: oklch(0.17 0.012 265);
+    --surface-muted: oklch(0.21 0.014 265);
+    --surface-raised: oklch(0.24 0.015 265);
+    --content: oklch(0.96 0.003 265);
+    --content-muted: oklch(0.71 0.012 265);
+    --line: oklch(0.31 0.015 265);
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-content);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Visible keyboard focus everywhere, without the mouse-click outline. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+
+  /**
+   * Respect a user who has asked the OS for less motion.
+   *
+   * Not decoration: vestibular disorders make large transforms genuinely
+   * unpleasant. Near-zero rather than `none` so transitionend/animationend
+   * listeners still fire and nothing hangs waiting for them.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/**
+ * CUSTOM UTILITIES — `@utility` is the v4 replacement for v3's
+ * `addUtilities` plugin API. Unlike a plain CSS class, a utility defined here
+ * participates in Tailwind's cascade layer and works with every variant:
+ * `hover:`, `md:`, `dark:`, `@container`, and so on.
+ */
+
+/**
+ * STATIC UTILITY — hide the scrollbar while keeping the element scrollable.
+ *
+ * Deliberately something Tailwind does NOT ship. Reimplementing an existing
+ * utility teaches nothing; this one needs three vendor-specific rules that are
+ * awkward to express inline.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}
+
+/**
+ * FUNCTIONAL UTILITY — responsive grid with no breakpoints at all.
+ *
+ * `grid-fit-64` becomes `repeat(auto-fit, minmax(16rem, 1fr))`, so the column
+ * count follows the available width. `--value(integer)` is the v4 mechanism
+ * for reading the numeric suffix, which means every size works without
+ * enumerating them; `--spacing()` converts it on Tailwind's 0.25rem scale, so
+ * `64` lines up with `w-64`.
+ *
+ * Worth knowing: Tailwind only emits a utility it has SEEN in scanned source.
+ * Build a class name dynamically (`clamp-${n}`) and nothing is generated —
+ * which is why these appear as literal strings in components.
+ */
+@utility grid-fit-* {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(--spacing(--value(integer)), 100%), 1fr)
+  );
+}
